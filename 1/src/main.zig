@@ -28,7 +28,7 @@ pub fn main() anyerror!void {
         var in_stream = buf_reader.reader();
         var total: u32 = 0;
         while (try in_stream.readUntilDelimiterOrEofAlloc(allocator, '\n', 32768)) |number_string| {
-            if (std.mem.eql(u8, number_string, "")) {
+            if (number_string.len == 0) {
                 var node_or = sorted_elfs.first;
                 while (node_or) |node| {
                     if (total > node.data) {
