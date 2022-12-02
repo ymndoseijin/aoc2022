@@ -5,48 +5,29 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 pub const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
 
 inline fn checkValue(player: u8) u32 {
-    switch (player) {
-        'X' => return 1,
-        'Y' => return 2,
-        'Z' => return 3,
-        else => {
-            std.log.info("{c}", .{player});
-            @panic("OOO WEEE OOO WEE");
-        },
-    }
+    if (player == 'X') return 1;
+    if (player == 'Y') return 2;
+    return 3;
 }
 
 inline fn checkWin(enemy: u8, player: u8) u32 {
     switch (player) {
         'X' => {
-            if (enemy == 'B') {
-                return 0;
-            } else if (enemy == 'C') {
-                return 6;
-            } else {
-                return 3;
-            }
+            if (enemy == 'B') return 0;
+            if (enemy == 'C') return 6;
+            return 3;
         },
         'Y' => {
-            if (enemy == 'C') {
-                return 0;
-            } else if (enemy == 'A') {
-                return 6;
-            } else {
-                return 3;
-            }
+            if (enemy == 'C') return 0;
+            if (enemy == 'A') return 6;
+            return 3;
         },
         'Z' => {
-            if (enemy == 'A') {
-                return 0;
-            } else if (enemy == 'B') {
-                return 6;
-            } else {
-                return 3;
-            }
+            if (enemy == 'A') return 0;
+            if (enemy == 'B') return 6;
+            return 3;
         },
         else => {
-            std.log.info("{c}", .{player});
             @panic("OOO WEEE OOO WEE");
         },
     }
@@ -113,7 +94,6 @@ pub fn main() anyerror!void {
                     }
                 },
                 else => {
-                    std.log.info("{c}", .{player});
                     @panic("OOO WEEE OOO WEE");
                 },
             }
