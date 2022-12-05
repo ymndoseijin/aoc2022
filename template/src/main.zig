@@ -4,7 +4,7 @@ const builtin = @import("builtin");
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 pub const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
 
-pub fn main() anyerror!void {
+pub fn main() !void {
     var arg_iterator = switch (builtin.os.tag) {
         .windows => try std.process.ArgIterator.initWithAllocator(allocator),
         else => std.process.args(),
@@ -23,6 +23,11 @@ pub fn main() anyerror!void {
 
         var buf_reader = std.io.bufferedReader(file.reader());
         var in_stream = buf_reader.reader();
-        _ = in_stream;
+
+        var buf: [2048]u8 = undefined;
+
+        while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
+            _ = line;
+        }
     }
 }
