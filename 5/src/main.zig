@@ -4,13 +4,6 @@ const builtin = @import("builtin");
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 pub const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
 
-inline fn reverse(array: anytype) void {
-    for (array.items[0 .. array.items.len / 2]) |t, i| {
-        array.items[i] = array.items[array.items.len - i - 1];
-        array.items[array.items.len - i - 1] = t;
-    }
-}
-
 pub fn main() !void {
     var arg_iterator = switch (builtin.os.tag) {
         .windows => try std.process.ArgIterator.initWithAllocator(allocator),
@@ -53,7 +46,7 @@ pub fn main() !void {
                     if (token[0] != '[') {
                         in_stacks = false;
                         for (stacks) |*stack, j| {
-                            reverse(stack);
+                            std.mem.reverse(u8, stack.items);
 
                             exciting_stacks[j] = try stack.clone();
                         }
@@ -79,7 +72,7 @@ pub fn main() !void {
                     try stacks[to].append(stacks[from].pop());
                 }
 
-                reverse(crates);
+                std.mem.reverse(u8, crates.items);
 
                 for (crates.items) |crate| {
                     try exciting_stacks[to].append(crate);
