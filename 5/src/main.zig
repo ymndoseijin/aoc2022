@@ -26,7 +26,7 @@ pub fn main() !void {
 
         var buf: [2048]u8 = undefined;
 
-        var stacks: [9]std.ArrayList(u8) = undefined;
+        var stacks = [1]std.ArrayList(u8){std.ArrayList(u8).init(allocator)} ** 9;
         var exciting_stacks: [9]std.ArrayList(u8) = undefined;
 
         for (stacks) |*stack| {
