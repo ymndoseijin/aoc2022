@@ -63,7 +63,7 @@ fn free(dir: *Dir, level: u64) !u64 {
     while (iter.next()) |entry| {
         switch (entry.value_ptr.*) {
             FileTag.file => |value| {
-                std.log.info("{s}: {}", .{ value.name, value.size });
+                //std.log.info("{s}: {}", .{ value.name, value.size });
                 total += value.size;
                 allocator.free(value.name);
             },
