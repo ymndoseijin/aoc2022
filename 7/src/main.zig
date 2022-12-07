@@ -159,20 +159,16 @@ pub fn main() !void {
                         allocator.free(current_path.pop());
                         current_dir = current_dir.parent;
                     } else {
-                        std.log.info("1 mkdir {s}: {s}, {s}", .{ current_path.items, line, arg1 });
                         current_dir = try mkDir(try allocator.dupe(u8, arg1));
                         try current_path.append(try allocator.dupe(u8, arg1));
-                        std.log.info("2 mkdir {s}: {s}, {s}", .{ current_path.items, line, arg1 });
                     }
                 } else if (std.mem.eql(u8, arg0, "ls")) {
-                    std.log.info("in ls", .{});
                     in_ls = true;
                 }
             } else {
                 if (in_ls and !current_dir.did_ls) {
                     var args = std.mem.tokenize(u8, line, " ");
                     var arg0 = args.next().?;
-                    std.log.info("{s}: {s} {s}", .{ current_path.items, line, arg0 });
 
                     if (std.mem.eql(u8, arg0, "dir")) {
                         var new_dir_name = args.next().?;
@@ -180,7 +176,6 @@ pub fn main() !void {
                         _ = try mkDir(try allocator.dupe(u8, new_dir_name));
                     } else {
                         var size = try std.fmt.parseInt(u64, arg0, 10);
-                        std.log.info("in file {}", .{size});
                         try touchSize(try allocator.dupe(u8, args.next().?), size);
                     }
                 }
