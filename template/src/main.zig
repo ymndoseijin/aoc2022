@@ -10,14 +10,9 @@ pub fn main() !void {
         else => std.process.args(),
     };
 
-    var first = true;
+    _ = arg_iterator.next();
 
     while (arg_iterator.next()) |path| {
-        if (first) {
-            first = false;
-            continue;
-        }
-
         var file = try std.fs.cwd().openFile(path, .{});
         defer file.close();
 
