@@ -4,24 +4,26 @@ const builtin = @import("builtin");
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 pub const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
 
+const Vector2 = @Vector(2, usize);
+
 const Point = struct {
-    pos: @Vector(2, usize),
-    cost: *std.AutoHashMap(@Vector(2, usize), u64),
+    pos: Vector2,
+    cost: *std.AutoHashMap(Vector2, u64),
 };
 
 const Problem = struct {
     height_map: [][]u8,
     queue: std.PriorityQueue(Point, void, sortScore),
-    cost_map: std.AutoHashMap(@Vector(2, usize), u64),
-    before_map: std.AutoHashMap(@Vector(2, usize), @Vector(2, usize)),
-    start: @Vector(2, usize),
-    end: @Vector(2, usize),
+    cost_map: std.AutoHashMap(Vector2, u64),
+    before_map: std.AutoHashMap(Vector2, Vector2),
+    start: Vector2,
+    end: Vector2,
     part_one: bool,
 
-    pub fn init(start: @Vector(2, usize), end: @Vector(2, usize), height_map: [][]u8, part_one: bool) !Problem {
+    pub fn init(start: Vector2, end: Vector2, height_map: [][]u8, part_one: bool) !Problem {
         var queue = std.PriorityQueue(Point, void, sortScore).init(allocator, {});
-        var cost_map = std.AutoHashMap(@Vector(2, usize), u64).init(allocator);
-        var before_map = std.AutoHashMap(@Vector(2, usize), @Vector(2, usize)).init(allocator);
+        var cost_map = std.AutoHashMap(Vector2, u64).init(allocator);
+        var before_map = std.AutoHashMap(Vector2, Vector2).init(allocator);
         try cost_map.put(start, 0);
         try queue.add(Point{ .pos = start, .cost = &cost_map });
 
@@ -30,7 +32,7 @@ const Problem = struct {
         return Problem{ .height_map = height_map, .queue = queue, .cost_map = cost_map, .before_map = before_map, .end = end, .start = start, .part_one = part_one };
     }
 
-    fn addToQueue(self: *Problem, pos: @Vector(2, usize), preceding: @Vector(2, usize), score: u64) !void {
+    fn addToQueue(self: *Problem, pos: Vector2, preceding: Vector2, score: u64) !void {
         try self.cost_map.put(pos, score);
         try self.before_map.put(pos, preceding);
 
@@ -48,11 +50,11 @@ const Problem = struct {
         if (none) try self.queue.add(neighbor_point);
     }
 
-    fn partOne(self: *Problem, pos: @Vector(2, usize)) bool {
+    fn partOne(self: *Problem, pos: Vector2) bool {
         return pos[0] == self.end[0] and pos[1] == self.end[1];
     }
 
-    fn partTwo(self: *Problem, pos: @Vector(2, usize)) bool {
+    fn partTwo(self: *Problem, pos: Vector2) bool {
         return self.height_map[pos[0]][pos[1]] == 'a';
     }
 
@@ -78,7 +80,7 @@ const Problem = struct {
                 break;
             }
 
-            var neighbors = std.ArrayList(@Vector(2, usize)).init(allocator);
+            var neighbors = std.ArrayList(Vector2).init(allocator);
             defer neighbors.deinit();
             if (pos[0] != self.height_map.len - 1) try neighbors.append(.{ pos[0] + 1, pos[1] });
             if (pos[1] != self.height_map[0].len - 1) try neighbors.append(.{ pos[0], pos[1] + 1 });
@@ -125,8 +127,8 @@ pub fn main() !void {
         var height_two = std.ArrayList([]u8).init(allocator);
 
         var width: usize = 0;
-        var start: @Vector(2, usize) = undefined;
-        var end: @Vector(2, usize) = undefined;
+        var start: Vector2 = undefined;
+        var end: Vector2 = undefined;
 
         var loop_y: usize = 0;
         while (try in_stream.readUntilDelimiterOrEof(&buf, '\n')) |line| {
@@ -135,10 +137,10 @@ pub fn main() !void {
             for (line) |char, loop_x| {
                 if (char == 'S') {
                     row[loop_x] = 'a';
-                    start = @Vector(2, usize){ loop_y, loop_x };
+                    start = Vector2{ loop_y, loop_x };
                 } else if (char == 'E') {
                     row[loop_x] = 'z';
-                    end = @Vector(2, usize){ loop_y, loop_x };
+                    end = Vector2{ loop_y, loop_x };
                 }
             }
             try height_one.append(row);
